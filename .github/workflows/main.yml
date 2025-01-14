@@ -34,14 +34,7 @@ jobs:
               run: npx playwright install --with-deps
 
             - name: Run Playwright tests
-              run: npx playwright test --grep @smoke
-
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
-                name: playwright-report
-                path: playwright-report/
-                retention-days: 30
+              run: npx playwright test --grep @smoke --project=chromium
 
             - name: Date et heure du build
               run: echo "Le build a été lancé le ${{ env.Date }} à ${{ env.Time }} par ${{ env.Actor }}"
@@ -51,7 +44,7 @@ jobs:
 
             - name: SSH
               run: |
-                printf ${{ secrets.ACTION_SSH }} > ~/deployement_key && chmod 400 ~/deployement_key
+                echo ${{ secrets.ACTION_SSH }} > ~/deployement_key && chmod 400 ~/deployement_key
                 rsync -Pav -e "ssh -i ~/deployement_key -o StrictHostKeyChecking=no" ./git_action_P3/ ${{ secrets.USER_SSH}}@${{secrets.SERVER_SSH}}:/www/
     
     deploy:
